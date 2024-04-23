@@ -1,6 +1,6 @@
 ---
 - name: Set hostname as the environment name
-  shell: "hostnamectl set-hostname {{ wordpress_sites | dict2items | first | attr('key') }}"
+  shell: "hostnamectl set-hostname {{ wordpress_sites | dict2items | first.value }}"
 
 - name: Get hostname
   shell: hostname
