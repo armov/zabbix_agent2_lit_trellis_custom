@@ -47,6 +47,58 @@
     create: yes
   no_log: yes
 
+- name: Detect php version
+  shell: "php -v | grep -oP 'PHP\s+\K\d+\.\d+' | head -n1"
+  register: php_version
+
+- name:
+  block:
+
+    - name: Add fpm ini configuration params to enable status for FPM + nginx
+      ini_file: dest="/etc/php/{{ php_version.stdout }}/fpm/pool.d/wordpress.conf" section=wordpress option="{{ item.option }}" value="{{ item.value }}"
+      with_items:
+        - { option: pm.status_path, value: /status }
+        - { option: ping.path, value: /ping }
+
+    - name: Add nginx block to enable status and ping
+      blockinfile:
+        path: "/etc/nginx/sites-available/{{ zabbix_hostname.stdout }}.conf"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        prepend_newline: true
+        insertafter: "EOF"
+        block: |
+          server {
+            listen 80;
+            server_name localhost;
+            # Enable php-fpm status page
+            location ~ ^/(status|ping)$ {
+              ## disable access logging for request if you prefer
+              access_log off;
+
+              ## Only allow trusted IPs for security, deny everyone else
+              allow 127.0.0.1;
+              deny all;
+
+              include fastcgi_params;
+              fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+              fastcgi_index index.php;
+              fastcgi_pass unix:/var/run/php-fpm-wordpress.sock;
+            }
+          }
+
+    - name: Test nginx config
+      shell: "nginx -t"
+      register: nginx_is_reloadable
+      ignore_errors: yes
+
+    - name: DO - Nginx reload
+      systemd:
+        name: nginx
+        state: reloaded
+      when: nginx_is_reloadable is defined and "/etc/nginx/nginx.conf syntax is ok" in nginx_is_reloadable.stderr and "/etc/nginx/nginx.conf test is successful" in nginx_is_reloadable.stderr
+  
+  when: php_version.stdout is not empty and "not found" not in php_version.stderr
+
 - name: Enable and Restart Zabbix to apply new configuration
   systemd:
     name: zabbix-agent2
