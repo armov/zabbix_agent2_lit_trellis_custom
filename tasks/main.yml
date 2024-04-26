@@ -65,7 +65,6 @@
       blockinfile:
         path: "/etc/nginx/sites-available/{{ zabbix_hostname.stdout }}.conf"
         marker: "# {mark} ANSIBLE MANAGED BLOCK"
-        prepend_newline: true
         insertafter: "EOF"
         block: |
           server {
