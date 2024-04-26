@@ -98,7 +98,7 @@
         state: reloaded
       when: nginx_is_reloadable is defined and "/etc/nginx/nginx.conf syntax is ok" in nginx_is_reloadable.stderr and "/etc/nginx/nginx.conf test is successful" in nginx_is_reloadable.stderr
   
-  when: php_version.stdout is not empty and "not found" not in php_version.stderr
+  when: php_version.stdout is defined and "not found" not in php_version.stderr
 
 - name: Enable and Restart Zabbix to apply new configuration
   systemd:
