@@ -48,7 +48,8 @@
   no_log: yes
 
 - name: Detect php version
-  shell: "php -v | grep -oP 'PHP\s+\K\d+\.\d+' | head -n1"
+  shell: |
+    php -v | grep -oP 'PHP\s+\K\d+\.\d+' | head -n1
   register: php_version
 
 - name:
