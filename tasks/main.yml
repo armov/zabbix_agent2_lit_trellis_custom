@@ -50,13 +50,13 @@
 - name: Detect php version
   shell: |
     php -v | grep -oP 'PHP\s+\K\d+\.\d+' | head -n1
-  register: php_version
+  register: php_detected_version
 
 - name:
   block:
 
     - name: Add fpm ini configuration params to enable status for FPM + nginx
-      ini_file: dest="/etc/php/{{ php_version.stdout }}/fpm/pool.d/wordpress.conf" section=wordpress option="{{ item.option }}" value="{{ item.value }}"
+      ini_file: dest="/etc/php/{{ php_detected_version.stdout }}/fpm/pool.d/wordpress.conf" section=wordpress option="{{ item.option }}" value="{{ item.value }}"
       with_items:
         - { option: pm.status_path, value: /status }
         - { option: ping.path, value: /ping }
@@ -97,7 +97,7 @@
         state: reloaded
       when: nginx_is_reloadable is defined and "/etc/nginx/nginx.conf syntax is ok" in nginx_is_reloadable.stderr and "/etc/nginx/nginx.conf test is successful" in nginx_is_reloadable.stderr
   
-  when: php_version.stdout is defined and "not found" not in php_version.stderr
+  when: php_detected_version.stdout is defined and "not found" not in php_detected_version.stderr
 
 - name: Enable and Restart Zabbix to apply new configuration
   systemd:
