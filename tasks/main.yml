@@ -99,6 +99,30 @@
   
   when: php_detected_version.stdout is defined and "not found" not in php_detected_version.stderr
 
+- name: Detect MariaDB/MySQL
+  shell: "systemctl is-active mariadb"
+  register: mariadb_installed
+
+- name: Execute only if Mysql/MariaDB is installed
+  block:
+
+    - name: Read root password
+      shell: |
+        cat /root/.my.cnf | grep password | cut -d '"' -f2
+      register: root_password
+
+    - name: Create Zabbix user and grant permissions to the DB engine
+      mysql_user:
+        name: zbx_monitor
+        host: "%"
+        password: "{{ zabbix_mysql_monitor_password }}"
+        priv: "REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW"
+        state: present
+      vars:
+        mysql_root_password: "{{ root_password.stdout }}"
+
+  when: "active" in mariadb_installed.stdout
+
 - name: Enable and Restart Zabbix to apply new configuration
   systemd:
     name: zabbix-agent2
