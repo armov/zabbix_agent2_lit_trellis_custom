@@ -113,8 +113,8 @@
         password: "{{ zabbix_mysql_monitor_password }}"
         priv: "REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW"
         state: present
-      vars:
-        mysql_root_password: "{{ vault_mysql_root_password }}"
+        login_user: root
+        login_password: "{{ vault_mysql_root_password }}"
 
   when: '"active" in mariadb_installed.stdout'
 
