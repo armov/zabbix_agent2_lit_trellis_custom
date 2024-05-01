@@ -121,7 +121,7 @@
       vars:
         mysql_root_password: "{{ root_password.stdout }}"
 
-  when: "active" in mariadb_installed.stdout
+  when: '"active" in mariadb_installed.stdout'
 
 - name: Enable and Restart Zabbix to apply new configuration
   systemd:
