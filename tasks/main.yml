@@ -106,11 +106,6 @@
 - name: Execute only if Mysql/MariaDB is installed
   block:
 
-    - name: Read root password
-      shell: |
-        cat /root/.my.cnf | grep password | cut -d '"' -f2
-      register: root_password
-
     - name: Create Zabbix user and grant permissions to the DB engine
       mysql_user:
         name: zbx_monitor
@@ -119,7 +114,7 @@
         priv: "REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW"
         state: present
       vars:
-        mysql_root_password: "{{ root_password.stdout }}"
+        mysql_root_password: "{{ vault_mysql_root_password }}"
 
   when: '"active" in mariadb_installed.stdout'
 
