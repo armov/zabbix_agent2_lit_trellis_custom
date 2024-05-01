@@ -106,11 +106,6 @@
 - name: Execute only if Mysql/MariaDB is installed
   block:
 
-    - name: Install MySQL Python package
-      apt:
-        name: python-mysqldb
-        state: present
-
     - name: Read root password
       shell: |
         cat /root/.my.cnf | grep password | cut -d '"' -f2
