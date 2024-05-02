@@ -111,7 +111,7 @@
         name: zbx_monitor
         host: "%"
         password: "{{ zabbix_mysql_monitor_password }}"
-        priv: "REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW"
+        priv: "*.*:REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW"
         state: present
         login_user: root
         login_password: "{{ vault_mysql_root_password }}"
