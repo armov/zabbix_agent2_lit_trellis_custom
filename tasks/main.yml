@@ -4,6 +4,7 @@
   loop: "{{ wordpress_sites | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
+  when: trellis_enabled | default(true) | bool
 
 - name: Get hostname
   shell: hostname
