@@ -69,6 +69,7 @@
         insertafter: "EOF"
         block: |
           server {
+            listen [::]:80;
             listen 80;
             server_name localhost;
             # Enable php-fpm status page
@@ -78,6 +79,7 @@
 
               ## Only allow trusted IPs for security, deny everyone else
               allow 127.0.0.1;
+              allow ::1;
               deny all;
 
               include fastcgi_params;
@@ -103,6 +105,7 @@
 - name: Detect MariaDB/MySQL
   shell: "systemctl is-active mariadb"
   register: mariadb_installed
+  ignore_errors: yes
 
 - name: Execute only if Mysql/MariaDB is installed
   block:
@@ -117,7 +120,7 @@
         login_user: root
         login_password: "{{ vault_mysql_root_password }}"
 
-  when: '"active" in mariadb_installed.stdout'
+  when: '"inactive" not in  mariadb_installed.stdout'
 
 - name: Enable and Restart Zabbix to apply new configuration
   systemd:
