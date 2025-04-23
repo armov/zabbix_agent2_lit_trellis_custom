@@ -107,6 +107,7 @@
         state: present
         login_user: root
         login_password: "{{ vault_mysql_root_password }}"
+        column_case_sensitive: false
 
   when: '"inactive" not in  mariadb_installed.stdout'
 
