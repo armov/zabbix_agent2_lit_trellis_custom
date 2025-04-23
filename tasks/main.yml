@@ -24,6 +24,22 @@
     group: root
     mode: '0644'
 
+- name: Disable PostgreSQL plugin path in Zabbix Agent 2 config
+  lineinfile:
+    path: /etc/zabbix/zabbix_agent2.d/plugins.d/postgresql.conf
+    regexp: '^Plugins\.PostgreSQL\.System\.Path=.*'
+    line: '# Plugins.PostgreSQL.System.Path=/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-postgresql'
+    state: present
+    backrefs: yes
+
+- name: Disable MongoDB plugin path in Zabbix Agent 2 config
+  lineinfile:
+    path: /etc/zabbix/zabbix_agent2.d/plugins.d/mongodb.conf
+    regexp: '^Plugins\.MongoDB\.System\.Path=.*'
+    line: '# Plugins.MongoDB.System.Path=/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb'
+    state: present
+    backrefs: yes
+
 - name: Create PSK file
   lineinfile:
     path: /etc/zabbix/zabbix_agentd2.psk
