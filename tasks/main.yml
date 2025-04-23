@@ -31,6 +31,7 @@
     line: '# Plugins.PostgreSQL.System.Path=/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-postgresql'
     state: present
     backrefs: yes
+  ignore_errors: yes
 
 - name: Disable MongoDB plugin path in Zabbix Agent 2 config
   lineinfile:
@@ -39,6 +40,7 @@
     line: '# Plugins.MongoDB.System.Path=/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb'
     state: present
     backrefs: yes
+  ignore_errors: yes
 
 - name: Create PSK file
   lineinfile:
