@@ -11,7 +11,9 @@
 
 - name: Determine if upgrade is needed
   set_fact:
-    zabbix_agent2_needs_upgrade: "{{ (zabbix_agent2_installed_version is version(zabbix_target_version, '<')) or (zabbix_agent2_installed_version == '0') }}"
+    zabbix_agent2_needs_upgrade: >-
+      {{ (zabbix_agent2_installed_version | default('0')) is version(zabbix_target_version, '<') 
+         or (zabbix_agent2_installed_version | default('0')) == '0' }}
 
 - name: Define Zabbix repo package URL
   set_fact:
