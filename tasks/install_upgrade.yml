@@ -1,19 +1,21 @@
 ---
-- name: Check if Zabbix Agent 2 is installed
-  shell: dpkg -s zabbix-agent2 | grep '^Version:' | awk '{print $2}'
-  register: zabbix_agent2_version_check
-  changed_when: false
-  failed_when: false
+- name: Gather installed packages
+  package_facts:
+    manager: auto
 
-- name: Set Zabbix Agent 2 installed version fact
+- name: Check if Zabbix Agent 2 installed
   set_fact:
-    zabbix_agent2_installed_version: "{{ zabbix_agent2_version_check.stdout | default('0') }}"
+    zabbix_agent2_installed_version: "{{ ansible_facts.packages['zabbix-agent2'][0]['version'] | default('0') }}"
+  when: "'zabbix-agent2' in ansible_facts.packages"
+
+- name: Set default version if Zabbix agent not installed
+  set_fact:
+    zabbix_agent2_installed_version: "0"
+  when: "'zabbix-agent2' not in ansible_facts.packages"
 
 - name: Determine if upgrade is needed
   set_fact:
-    zabbix_agent2_needs_upgrade: >-
-      {{ (zabbix_agent2_installed_version | default('0')) is version(zabbix_target_version, '<') 
-         or (zabbix_agent2_installed_version | default('0')) == '0' }}
+    zabbix_agent2_needs_upgrade: "{{ (zabbix_agent2_installed_version | default('0')) == '0' or (zabbix_agent2_installed_version is version(zabbix_target_version, '<')) }}"
 
 - name: Define Zabbix repo package URL
   set_fact:
